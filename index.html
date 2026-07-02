@@ -1,462 +1,370 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen Parcial - Microcontroladores</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Multimodal Depression-Detection Pipeline - IEEE Poster Style</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .code-font { font-family: 'Fira Code', monospace; }
+        /* Estilos generales para centrar el póster en la ventana */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e2e8f0; 
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        .poster-container {
+            width: 100%;
+            max-width: 1600px;
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
         
-        /* Animaciones para Notificaciones */
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        .toast { animation: slideIn 0.3s ease-out forwards; }
-        .toast.hiding { animation: fadeOut 0.5s ease-out forwards; }
+        /* Ajustado para no afectar al ícono del botón */
+        .poster-container > svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
-        /* Estilos de impresión para el reporte final */
-        @media print {
-            body { background: white; }
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            .container { box-shadow: none; max-width: 100%; padding: 0; }
+        /* Estilos del botón flotante */
+        .download-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #0056B3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: background-color 0.3s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn:hover {
+            background-color: #004494;
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body>
 
-    <!-- Notificaciones flotantes -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+<!-- Botón flotante de descarga -->
+<button id="downloadBtn" class="download-btn">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+    </svg>
+    Descargar PNG
+</button>
 
-    <main class="flex-grow flex items-center justify-center p-4">
-        <div id="app-card" class="bg-white rounded-xl shadow-lg w-full max-w-5xl p-6 md:p-10 transition-all duration-300">
-            
-            <!-- Encabezado -->
-            <div class="text-center mb-8 border-b pb-4">
-                <h1 class="text-2xl md:text-3xl font-bold text-blue-800">Evaluación Parcial: Microcontroladores</h1>
-                <p class="text-gray-500 mt-2">Ingeniería Mecatrónica - Lenguaje C Embebido</p>
-                <div id="examen-meta" class="hidden mt-4 flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-semibold text-gray-600 bg-gray-50 p-3 rounded-lg">
-                    <span id="display-serie"><i class="fas fa-file-alt text-blue-500"></i> Serie: -</span>
-                    <span id="display-time"><i class="fas fa-clock text-green-500"></i> Tiempo: 00:00</span>
-                    <span id="display-warnings" class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Infracciones: 0</span>
-                </div>
-            </div>
-
-            <!-- VISTA 1: REGISTRO Y REGLAS -->
-            <div id="vista-registro" class="block">
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r">
-                    <div class="flex">
-                        <div class="flex-shrink-0"><i class="fas fa-info-circle text-yellow-400"></i></div>
-                        <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
-                                <strong>Reglas de Integridad (Obligatorias):</strong><br>
-                                1. Al presionar comenzar, el sistema registrará si abandona esta pestaña y el examen valdrá cero.<br>
-                                2. Está prohibido el uso de herramientas de IA y la comunicación con sus demás compañeros.<br> 
-                                3. La prueba consta de casos prácticos con niveles de complejidad progresiva (Basado en la Taxonomía de Bloom).
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-4 max-w-md mx-auto">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
-                        <input type="text" id="alumno-nombre" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Apellidos y Nombres">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula</label>
-                        <input type="text" id="alumno-matricula" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Ej. 18020010">
-                    </div>
-                    <button onclick="app.iniciar()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-6 shadow-md">
-                        <i class="fas fa-play mr-2"></i> Iniciar Evaluación
-                    </button>
-                </div>
-            </div>
-
-            <!-- VISTA 2: CUESTIONARIO -->
-            <div id="vista-examen" class="hidden">
-                <div id="contenedor-preguntas" class="space-y-8">
-                    <!-- Inyectado mediante JavaScript -->
-                </div>
+<div class="poster-container">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+        <defs>
+            <!-- Tipografía limpia y formal para impresión (Google Fonts Roboto) -->
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+                text { font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif; }
                 
-                <div class="mt-10 pt-6 border-t flex justify-end">
-                    <button onclick="app.entregar()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-md">
-                        <i class="fas fa-paper-plane mr-2"></i> Entregar Examen
-                    </button>
-                </div>
-            </div>
-
-            <!-- VISTA 3: REPORTE FORMATIVO (STEPGRADE) -->
-            <div id="vista-reporte" class="hidden">
-                <div id="reporte-contenido">
-                    <!-- Inyectado mediante JavaScript -->
-                </div>
+                /* Clases tipográficas para mantener jerarquía visual - TAMAÑOS AUMENTADOS */
+                .phase-title { font-size: 24px; font-weight: 900; fill: #495057; letter-spacing: 1.5px; }
+                .phase-subtitle { font-size: 26px; font-weight: 700; fill: #212529; }
+                .input-title { font-size: 26px; font-weight: 900; fill: #212529; }
+                .input-text { font-size: 20px; font-weight: 500; fill: #343A40; }
+                .input-sub { font-size: 18px; font-weight: 400; fill: #6C757D; }
                 
-                <div class="mt-8 flex justify-center gap-4 no-print">
-                    <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow">
-                        <i class="fas fa-file-pdf mr-2"></i> Guardar/Imprimir PDF
-                    </button>
-                    <button onclick="location.reload()" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2 px-6 rounded-lg transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i> Finalizar Sesión
-                    </button>
-                </div>
-            </div>
+                .block-text { font-size: 20px; font-weight: 700; fill: #212529; text-anchor: middle; }
+                .model-text { font-size: 24px; font-weight: 700; fill: #212529; text-anchor: middle; }
+                
+                /* Nuevos estilos para la metodología detallada - TAMAÑOS AUMENTADOS */
+                .tag-text { font-size: 18px; font-weight: 700; fill: #495057; text-anchor: middle; }
+                .detail-text { font-size: 16px; font-weight: 400; fill: #6C757D; text-anchor: middle; }
+                
+                .outcome-text { font-size: 24px; font-weight: 700; text-anchor: middle; }
+            </style>
 
-        </div>
-    </main>
+            <!-- Flecha gris sólida (Estándar académico) -->
+            <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#6C757D" />
+            </marker>
+        </defs>
 
-<script>
-const app = (function() {
-    // --- CONFIGURACIÓN DEL BACKEND ---
-    // SUSTITUYA ESTA URL POR LA SUYA DE GOOGLE APPS SCRIPT AL PASARLO A GITHUB
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQFilJTBT7_qBDXlThxC89VYeOY0Gt8hCqIoGkqBMPHog_GIra4cYJ2gYJZtPO1JCY/exec';
+        <!-- Fondo del canvas del póster: Blanco Puro -->
+        <rect width="1600" height="900" fill="#FFFFFF" />
 
-    const state = {
-        alumno: { nombre: '', matricula: '', serie: '' },
-        seguridad: { salidas: 0, tiempoInicio: null, intervaloTimer: null, minutos: 0, segundos: 0 },
-        preguntasActivas: []
-    };
-
-    // BANCO DE PREGUNTAS (10 Reactivos = 40 Puntos Totales. 4 Pts cada una)
-    const bancoMaestro = [
-        // NIVEL 1: Recordar y Comprender (Enfoque en Funcionalidad)
-        {
-            id: 'q1', nivel: 1, tipo: 'radio', pts: 4,
-            contexto: 'Caso A: Optimización de recursos. Se requiere almacenar el resultado del conversor analógico-digital (ADC) de 10 bits de un sensor de luz.',
-            texto: '¿Qué tipo de dato de <stdint.h> garantiza almacenar el valor del ADC (0-1023) sin perder datos y usando la menor RAM posible?',
-            opciones: ['uint8_t', 'int8_t', 'uint16_t', 'float'],
-            correcta: 2,
-            retro: 'Un ADC de 10 bits genera valores de 0 a 1023. El tipo uint8_t (0-255) causaría desbordamiento perdiendo datos funcionales. Se requiere un uint16_t (0-65535).'
-        },
-        {
-            id: 'q2', nivel: 1, tipo: 'radio', pts: 4,
-            contexto: 'Caso B: Análisis de Sintaxis de Control. Un ingeniero ha escrito esta condición crítica en una caldera: if (temperatura = 100)',
-            texto: '¿Qué impacto funcional y metodológico tiene esta línea de código en el sistema?',
-            opciones: [
-                'Compara si temperatura es 100 y ejecuta el bloque si es correcto.',
-                'Es un error de compilación. El sistema no generará el archivo binario.',
-                'Asigna el valor 100 a la variable y siempre evalúa la condición como verdadera (True).',
-                'Borra el valor de temperatura en memoria debido a un error de puntero.'
-            ],
-            correcta: 2,
-            retro: 'El operador "=" es de asignación, no relacional ("=="). Esto altera la variable y crea un bloque condicional que se ejecutará siempre de manera errónea.'
-        },
-        {
-            id: 'q3', nivel: 1, tipo: 'radio', pts: 4,
-            contexto: 'Caso C: Estructura del Firmware. En la función main() de un microcontrolador (ej. AVR o PIC) siempre observamos un bucle "while(1)".',
-            texto: '¿Cuál es la razón técnica fundamental para esta práctica?',
-            opciones: [
-                'Para ahorrar energía poniendo al microcontrolador en modo Sleep.',
-                'Porque no hay sistema operativo que recoja el "return"; salir del main produce comportamiento indefinido.',
-                'Para que las interrupciones del Timer funcionen adecuadamente.',
-                'Es puramente estético y se puede omitir sin consecuencias.'
-            ],
-            correcta: 1,
-            retro: 'A diferencia del software de PC, si el firmware embebido termina su main(), el procesador ejecutará memoria inválida causando un reinicio o fallo fatal.'
-        },
+        <!-- ========================================== -->
+        <!-- CONTENEDORES DE LAS FASES (Grises neutros) -->
+        <!-- ========================================== -->
         
-        // NIVEL 2: Aplicar y Analizar (Enfoque en Calidad y Estructuras)
-        {
-            id: 'q4', nivel: 2, tipo: 'radio', pts: 4,
-            contexto: 'Caso D: Mantenibilidad con Punteros. Observe la siguiente función que actualiza una variable global indirectamente: void calcular(int *p) { *p = *p + 10; }',
-            texto: 'Si en la configuración declara "int x = 5;" y llama a la función "calcular(&x);", ¿cuál es el valor final almacenado en x?',
-            opciones: ['5', '10', '15', 'Error de segmentación de memoria'],
-            correcta: 2,
-            retro: 'Al usar el operador "&" enviamos la dirección de memoria. La función desreferencia el puntero ("*") y suma 10 al valor original en esa misma dirección de memoria (5+10 = 15).'
-        },
-        {
-            id: 'q5', nivel: 2, tipo: 'radio', pts: 4,
-            contexto: 'Caso E: Gestión de Memoria y Vectores. Se declara un arreglo para lecturas UART: uint8_t buffer[5] = {1,2,3,4,5}; Posteriormente, un bucle intenta escribir en buffer[5].',
-            texto: '¿Qué sucede a nivel de la memoria RAM del microcontrolador?',
-            opciones: [
-                'Se sobreescribe el número 5 de forma correcta y segura.',
-                'Ocurre un desbordamiento de arreglo (Buffer Overflow) corrompiendo datos en la memoria contigua.',
-                'El compilador marca error de sintaxis y detiene la compilación.',
-                'El microcontrolador redimensiona el arreglo automáticamente para evitar fallos.'
-            ],
-            correcta: 1,
-            retro: 'Los índices en C inician en 0. Un arreglo de tamaño 5 va del índice 0 al 4. Acceder al índice 5 lee/escribe fuera de los límites, causando corrupción de memoria (Buffer Overflow).'
-        },
-        {
-            id: 'q6', nivel: 2, tipo: 'radio', pts: 4,
-            contexto: 'Caso F: Mapeo de Periféricos e Interfaces. Requiere leer la posición de un potenciómetro para inyectarla directamente al ciclo de trabajo de un PWM (Control de Motor).',
-            texto: 'Considerando las resoluciones típicas del hardware, ¿cuál es el análisis correcto sobre la relación entre analogRead() y analogWrite()?',
-            opciones: [
-                'Ambos utilizan escalas de 0 a 1023, por lo que el paso de datos es directo.',
-                'analogRead da un rango de 0 a 1023 y analogWrite recibe de 0 a 255. Es imperativo utilizar map() o dividir entre 4.',
-                'Sus registros no son compatibles y requieren conversión analógica intermedia externa.',
-                'analogRead proporciona valores de 0 a 255 mientras que analogWrite controla de 0 a 1023.'
-            ],
-            correcta: 1,
-            retro: 'Para garantizar calidad, es necesario escalar los datos. Los ADC típicos son de 10 bits (0-1023) y el PWM estándar es de 8 bits (0-255).'
-        },
-        {
-            id: 'q7', nivel: 2, tipo: 'codigo', pts: 4,
-            contexto: 'Caso G: Aplicación de Operadores de Punteros. Para que una función modifique una variable local "int velocidad = 0;", debe enviarle la dirección de memoria de la variable.',
-            texto: 'Complete el código con el operador matemático adecuado para obtener la dirección en memoria de la variable "velocidad".',
-            codigoBase: "ajustarParametro(________velocidad);",
-            respuestaRegex: /&/i,
-            retro: 'El operador "&" (Ampersand) extrae la dirección de memoria de una variable, permitiendo el paso por referencia y mejorando la calidad/modularidad del código.'
-        },
+        <!-- Panel de Input -->
+        <rect x="15" y="80" width="135" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
+        <rect x="15" y="80" width="135" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
+        <text x="82.5" y="118" text-anchor="middle" class="input-title">INPUT</text>
+        
+        <text x="82.5" y="380" text-anchor="middle" class="input-text">DAIC-WOZ</text>
+        <text x="82.5" y="405" text-anchor="middle" class="input-text">dataset</text>
+        <text x="82.5" y="435" text-anchor="middle" class="input-text">—</text>
+        <text x="82.5" y="465" text-anchor="middle" class="input-text">189 clinical</text>
+        <text x="82.5" y="490" text-anchor="middle" class="input-text">interviews</text>
+        <text x="82.5" y="530" text-anchor="middle" class="input-sub">(transcripts</text>
+        <text x="82.5" y="555" text-anchor="middle" class="input-sub">+ audio)</text>
 
-        // NIVEL 3: Evaluar y Crear (Enfoque en Eficiencia y Optimización)
-        {
-            id: 'q8', nivel: 3, tipo: 'codigo', pts: 4,
-            contexto: 'Caso H: Arquitectura de Datos (Red de Sensores IoT). Necesita agrupar ID, Temperatura y Humedad en una sola entidad estructurada.',
-            texto: 'Complete la palabra reservada clave para crear y definir esta estructura de datos personalizada llamada "Sensor".',
-            codigoBase: "typedef ________ {\n   uint8_t id;\n   float temp;\n} Sensor;",
-            respuestaRegex: /struct/i,
-            retro: 'La directiva "struct" permite crear abstracciones de datos eficientes, agrupando variables para facilitar su paso por referencia en la arquitectura del software.'
-        },
-        {
-            id: 'q9', nivel: 3, tipo: 'codigo', pts: 4,
-            contexto: 'Caso I: Manipulación de Registros de Hardware a Nivel de Bit (Operación SET).',
-            texto: 'Para optimizar ciclos de reloj, escriba el operador compuesto de asignación que aplique una máscara OR lógica para ENCENDER (poner en 1) únicamente el bit 2 de PORTB.',
-            codigoBase: "PORTB ________ (1 << 2);",
-            respuestaRegex: /\|=/i,
-            retro: 'El uso de "|= " (OR igual) junto con el desplazamiento (<<) es la forma más eficiente y estándar en la industria para encender bits específicos en registros de hardware sin afectar el resto.'
-        },
-        {
-            id: 'q10', nivel: 3, tipo: 'codigo', pts: 4,
-            contexto: 'Caso J: El Reto de la Caja Fuerte (Prevención de Fragmentación de Heap). Queda estrictamente prohibido usar la clase dinámica "String" para el ingreso de contraseñas.',
-            texto: 'Declare el tipo de dato primitivo para instanciar un arreglo estático de caracteres (estilo C) que almacenará una contraseña numérica de teclado.',
-            codigoBase: "________ clave[5];",
-            respuestaRegex: /char/i,
-            retro: 'Para optimizar memoria (Eficiencia) y evitar fragmentación, las cadenas deben manejarse estáticamente con arreglos de tipo "char", considerando siempre el espacio extra para el carácter nulo "\\0".'
-        }
-    ];
+        <!-- Phase 1 Panel -->
+        <rect x="160" y="80" width="410" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
+        <rect x="160" y="80" width="410" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
+        <text x="365" y="107" text-anchor="middle" class="phase-title">PHASE 1</text>
+        <text x="365" y="132" text-anchor="middle" class="phase-subtitle">DATA ACQ. &amp; PREPROCESSING</text>
 
-    // --- FUNCIONES DE SOPORTE UI ---
-    const showToast = (msg, type = 'info') => {
-        const bg = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-blue-500');
-        const icon = type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-        const t = document.createElement('div');
-        t.className = `toast ${bg} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`;
-        t.innerHTML = `<i class="fas ${icon} text-xl"></i><span class="font-medium">${msg}</span>`;
-        document.getElementById('toast-container').appendChild(t);
-        setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 500); }, 4000);
-    };
+        <!-- Phase 2 Panel -->
+        <rect x="580" y="80" width="335" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
+        <rect x="580" y="80" width="335" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
+        <text x="747.5" y="107" text-anchor="middle" class="phase-title">PHASE 2</text>
+        <text x="747.5" y="132" text-anchor="middle" class="phase-subtitle">FEATURE EXTRACTION</text>
 
-    const formatearTiempo = (min, seg) => `${min.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
+        <!-- Phase 3 Panel -->
+        <rect x="925" y="80" width="660" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
+        <rect x="925" y="80" width="660" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
+        <text x="1255" y="107" text-anchor="middle" class="phase-title">PHASE 3</text>
+        <text x="1255" y="132" text-anchor="middle" class="phase-subtitle">FUSION &amp; CLASSIFICATION</text>
 
-    const renderPreguntas = () => {
-        const container = document.getElementById('contenedor-preguntas');
-        container.innerHTML = '';
-        state.preguntasActivas.forEach((q, index) => {
-            const nivelBadge = q.nivel === 1 ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded border border-blue-200 font-bold tracking-wide"><i class="fas fa-brain mr-1"></i> NIVEL 1: Recordar/Comprender</span>' : 
-                               q.nivel === 2 ? '<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded border border-yellow-200 font-bold tracking-wide"><i class="fas fa-cogs mr-1"></i> NIVEL 2: Aplicar/Analizar</span>' : 
-                               '<span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded border border-purple-200 font-bold tracking-wide"><i class="fas fa-code-branch mr-1"></i> NIVEL 3: Evaluar/Crear</span>';
+
+        <!-- ========================================== -->
+        <!-- FILA 1: TEXTO (Azul Institucional #0056B3) -->
+        <!-- ========================================== -->
+        <g id="row1-text">
+            <!-- Bloque Transcripts -->
+            <rect x="175" y="190" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
+            <g transform="translate(250, 225)">
+                <rect x="-10" y="-12" width="20" height="24" rx="2" fill="none" stroke="#0056B3" stroke-width="2.5" />
+                <line x1="-5" y1="-6" x2="5" y2="-6" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="-5" y1="0" x2="5" y2="0" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="-5" y1="6" x2="2" y2="6" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <text x="250" y="275" class="block-text">Transcripts</text>
+
+            <line x1="325" y1="240" x2="380" y2="240" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Bloque Preprocessing (Texto) -->
+            <rect x="385" y="190" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
+            <g transform="translate(470, 225)">
+                <circle cx="0" cy="0" r="7" fill="none" stroke="#0056B3" stroke-width="2.5"/>
+                <circle cx="0" cy="0" r="2" fill="none" stroke="#0056B3" stroke-width="2.5"/>
+                <path d="M 0 -7 L 0 -10 M 5 -5 L 7 -7 M 7 0 L 10 0 M 5 5 L 7 7 M 0 7 L 0 10 M -5 5 L -7 7 M -7 0 L -10 0 M -5 -5 L -7 -7" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <text x="470" y="275" class="block-text">Preprocessing</text>
             
-            let html = `
-            <div class="bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-2 border-b border-gray-100 pb-3">
-                    <h3 class="text-lg font-bold text-gray-800">Reactivo ${index + 1} <span class="text-gray-400 text-sm ml-2 font-normal">Valor: ${q.pts} puntos</span></h3>
-                    ${nivelBadge}
-                </div>
-                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 mb-5 text-indigo-900 text-sm italic shadow-inner">
-                    <i class="fas fa-laptop-code text-indigo-400 mr-2"></i> <strong>Contexto:</strong> ${q.contexto}
-                </div>
-                <p class="text-gray-800 font-medium mb-5 text-base leading-relaxed">${q.texto}</p>
-            `;
+            <!-- Detalles Metodológicos -->
+            <text x="470" y="315" class="tag-text">Text Conditioning</text>
+            <text x="470" y="340" class="detail-text">Lowercase, noise/fillers filtering</text>
+            <text x="470" y="365" class="detail-text">512-token sequence windows</text>
 
-            if(q.tipo === 'radio') {
-                html += `<div class="space-y-3">`;
-                q.opciones.forEach((opc, i) => {
-                    html += `
-                    <label class="flex items-start p-4 border rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group">
-                        <input type="radio" name="${q.id}" value="${i}" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300 mt-0.5">
-                        <span class="ml-3 text-gray-700 group-hover:text-blue-900">${opc}</span>
-                    </label>`;
-                });
-                html += `</div>`;
-            } else if (q.tipo === 'codigo') {
-                const partes = q.codigoBase.split('________');
-                html += `
-                <div class="bg-gray-900 p-5 rounded-lg overflow-x-auto mt-2 shadow-inner border border-gray-700 flex flex-wrap items-center">
-                    <code class="code-font text-green-400 whitespace-pre-wrap">${q.codigoBase.includes('________') ? partes[0] : ''}</code>
-                    <input type="text" id="${q.id}" class="code-font bg-gray-800 text-white border-b-2 border-green-500 focus:outline-none focus:border-blue-400 px-3 py-1 mx-2 text-center my-2 text-lg min-w-[100px] w-auto max-w-xs" placeholder="[código]" autocomplete="off" spellcheck="false">
-                    <code class="code-font text-green-400 whitespace-pre-wrap">${q.codigoBase.includes('________') ? partes[1] : ''}</code>
-                </div>`;
-            }
-            html += `</div>`;
-            container.innerHTML += html;
-        });
-    };
+            <!-- Flecha de Texto a Ontología (Mapeo de Keywords) -->
+            <line x1="470" y1="380" x2="470" y2="395" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
 
-    // --- API PÚBLICA DEL MÓDULO ---
-    return {
-        iniciar: () => {
-            const nom = document.getElementById('alumno-nombre').value.trim();
-            const mat = document.getElementById('alumno-matricula').value.trim();
-            if(!nom || !mat) return showToast("Faltan datos. Ingrese nombre completo y matrícula.", "error");
+            <line x1="555" y1="240" x2="610" y2="240" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
 
-            // ASIGNACIÓN DETERMINISTA DE SERIE (A, B, C, D) VÍA MÓDULO 4
-            // Extrae solo los números de la matrícula y toma el último dígito
-            const matriculaNumerica = mat.replace(/\D/g, '');
-            const ultimoDigito = matriculaNumerica.length > 0 ? parseInt(matriculaNumerica.slice(-1)) : 0;
-            const indSerie = ultimoDigito % 4; // Asegura que el resultado sea 0, 1, 2 o 3
-            state.alumno.serie = ['A', 'B', 'C', 'D'][indSerie];
-            state.alumno.nombre = nom;
-            state.alumno.matricula = mat;
-
-            // Se carga el banco de preguntas 
-            state.preguntasActivas = [...bancoMaestro]; 
-
-            // Configurar UI
-            document.getElementById('vista-registro').classList.add('hidden');
-            document.getElementById('vista-examen').classList.remove('hidden');
-            document.getElementById('examen-meta').classList.remove('hidden');
-            document.getElementById('display-serie').innerHTML = `<i class="fas fa-file-alt text-blue-500"></i> Serie Asignada: ${state.alumno.serie}`;
-
-            // --- SISTEMA ANTI-TRAMPAS (API de Visibilidad) ---
-            document.addEventListener('visibilitychange', () => {
-                if(document.hidden && !document.getElementById('vista-examen').classList.contains('hidden')) {
-                    state.seguridad.salidas++;
-                    document.getElementById('display-warnings').innerHTML = `<i class="fas fa-exclamation-triangle"></i> Infracciones: ${state.seguridad.salidas}`;
-                    showToast("⚠️ INFRACCIÓN: Abandono de pestaña detectado. Este evento será notificado al profesor.", "error");
-                }
-            });
-
-            // --- CRONÓMETRO ---
-            state.seguridad.tiempoInicio = new Date();
-            state.seguridad.intervaloTimer = setInterval(() => {
-                state.seguridad.segundos++;
-                if(state.seguridad.segundos === 60) { state.seguridad.minutos++; state.seguridad.segundos = 0; }
-                document.getElementById('display-time').innerHTML = `<i class="fas fa-clock text-green-500"></i> Tiempo: ${formatearTiempo(state.seguridad.minutos, state.seguridad.segundos)}`;
-            }, 1000);
-
-            renderPreguntas();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast("Evaluación iniciada. ¡Mucho éxito!", "success");
-        },
-
-        entregar: () => {
-            // Confirmación de entrega
-            if(!confirm("¿Está seguro de enviar su evaluación? No podrá modificar sus respuestas.")) return;
-
-            // Detener cronómetro
-            clearInterval(state.seguridad.intervaloTimer);
-            let score = 0;
-            let maxScore = 40; // 10 preguntas de 4 puntos = 40
-            let stepGrade = { funcionalidad: [], calidad: [], eficiencia: [] };
-
-            // MOTOR DE CALIFICACIÓN
-            state.preguntasActivas.forEach(q => {
-                let esCorrecto = false;
-                
-                if(q.tipo === 'radio') {
-                    const select = document.querySelector(`input[name="${q.id}"]:checked`);
-                    if(select && parseInt(select.value) === q.correcta) esCorrecto = true;
-                } else if(q.tipo === 'codigo') {
-                    const rawAns = document.getElementById(q.id).value;
-                    const ansClean = rawAns.replace(/\s+/g, '').toLowerCase(); // Normalización anti-espacios y minúsculas
-                    if(q.respuestaRegex.test(ansClean)) esCorrecto = true;
-                }
-
-                if(esCorrecto) {
-                    score += q.pts;
-                } else {
-                    // Distribución de retroalimentación en rúbrica analítica
-                    // Nivel 1 -> Funcionalidad; Nivel 2 -> Calidad; Nivel 3 -> Eficiencia
-                    if(q.nivel === 1) stepGrade.funcionalidad.push(q.retro);
-                    else if(q.nivel === 2) stepGrade.calidad.push(q.retro);
-                    else stepGrade.eficiencia.push(q.retro);
-                }
-            });
-
-            // LÓGICA DE GAMIFICACIÓN / RANGO
-            const porcentaje = (score / maxScore) * 100;
-            let rango = ""; let claseRango = "";
-            if(porcentaje >= 85) { rango = "🏆 Arquitecto de Firmware (Nivel Sobresaliente)"; claseRango = "text-green-600"; }
-            else if(porcentaje >= 60) { rango = "🛠️ Programador Embebido (Nivel Aceptable)"; claseRango = "text-blue-600"; }
-            else { rango = "🌱 Aprendiz de Hardware (Requiere Repaso Urgente)"; claseRango = "text-red-600"; }
-
-            // RENDERIZAR REPORTE (VISTA 3)
-            document.getElementById('vista-examen').classList.add('hidden');
-            const repo = document.getElementById('reporte-contenido');
+            <!-- Bloque BioBERT -->
+            <rect x="615" y="200" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
+            <text x="747.5" y="248" class="model-text">BioBERT</text>
             
-            repo.innerHTML = `
-                <div class="border-4 border-gray-800 p-6 md:p-10 rounded-xl relative bg-white">
-                    <div class="absolute top-0 right-0 bg-gray-800 text-white px-4 py-1 rounded-bl-xl font-bold text-xs tracking-wider">REPORTE OFICIAL</div>
-                    
-                    <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800 border-b-2 border-gray-200 pb-3">Diagnóstico de Desempeño</h2>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-gray-50 p-5 rounded-lg border border-gray-200 shadow-sm">
-                        <div><p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Sustentante</p><p class="font-bold text-gray-800 truncate">${state.alumno.nombre}</p></div>
-                        <div><p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Matrícula</p><p class="font-bold text-gray-800">${state.alumno.matricula} (S: ${state.alumno.serie})</p></div>
-                        <div><p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Tiempo Empleado</p><p class="font-bold text-blue-600">${formatearTiempo(state.seguridad.minutos, state.seguridad.segundos)}</p></div>
-                        <div><p class="text-xs text-gray-500 uppercase tracking-widest mb-1">Integridad</p><p class="font-bold text-${state.seguridad.salidas > 0 ? 'red' : 'green'}-600">${state.seguridad.salidas} salidas</p></div>
-                    </div>
+            <!-- Detalles Metodológicos -->
+            <text x="747.5" y="315" class="tag-text">768-d Contextual Embedding</text>
+            <text x="747.5" y="340" class="detail-text">Base Extractor &amp; Fine-Tuned (FT)</text>
+            <text x="747.5" y="365" class="detail-text">Adam optimizer, Dropout (0.5)</text>
 
-                    <div class="text-center mb-10 p-8 bg-gray-100 rounded-xl shadow-inner border border-gray-200">
-                        <p class="text-gray-500 uppercase tracking-widest text-sm mb-2 font-bold">Puntaje Obtenido</p>
-                        <p class="text-6xl font-black mb-3 text-gray-800">${score} <span class="text-2xl text-gray-400">/ ${maxScore} pts</span></p>
-                        <p class="text-xl font-bold ${claseRango}">${rango}</p>
-                    </div>
+            <!-- Flecha a Sigma -->
+            <path d="M 880 240 C 920 240, 920 440, 940 440" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+        </g>
 
-                    <h3 class="text-xl font-bold text-gray-800 mb-5 flex items-center"><i class="fas fa-layer-group text-blue-500 mr-3"></i> Áreas de Mejora (Rúbrica StepGrade)</h3>
-                    <div class="space-y-5">
-                        
-                        <!-- Dimensión 1: Funcionalidad -->
-                        <div class="p-5 border-l-4 border-blue-500 bg-blue-50/50 rounded-r-lg">
-                            <h4 class="font-bold text-blue-800 mb-3 text-lg">1. Funcionalidad y Corrección Lógica (Nivel Básico)</h4>
-                            <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                                ${stepGrade.funcionalidad.length > 0 ? stepGrade.funcionalidad.map(r => `<li>${r}</li>`).join('') : '<li class="text-green-700 font-medium"><i class="fas fa-check-circle mr-1"></i>Excelente. Demuestra un dominio impecable de la sintaxis y variables.</li>'}
-                            </ul>
-                        </div>
 
-                        <!-- Dimensión 2: Calidad -->
-                        <div class="p-5 border-l-4 border-yellow-500 bg-yellow-50/50 rounded-r-lg">
-                            <h4 class="font-bold text-yellow-800 mb-3 text-lg">2. Calidad de Código y Arquitectura (Nivel Intermedio)</h4>
-                            <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                                ${stepGrade.calidad.length > 0 ? stepGrade.calidad.map(r => `<li>${r}</li>`).join('') : '<li class="text-green-700 font-medium"><i class="fas fa-check-circle mr-1"></i>Óptimo. Maneja apropiadamente punteros, memoria y paso por referencia.</li>'}
-                            </ul>
-                        </div>
+        <!-- ========================================== -->
+        <!-- FILA 2: ONTOLOGÍA (Cerceta/Teal #008080)   -->
+        <!-- ========================================== -->
+        <g id="row2-ontology">
+            <!-- Bloque PHQ-8 Knowledge Base -->
+            <rect x="175" y="400" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
+            <g transform="translate(250, 435)">
+                <rect x="-8" y="-10" width="16" height="20" rx="2" fill="none" stroke="#008080" stroke-width="2.5"/>
+                <line x1="-4" y1="-2" x2="4" y2="-2" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="-4" y1="4" x2="4" y2="4" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M -4 -10 V -12 A 2 2 0 0 1 4 -12 V -10" fill="none" stroke="#008080" stroke-width="2.5"/>
+            </g>
+            <text x="250" y="485" class="block-text">PHQ-8 Criteria</text>
 
-                        <!-- Dimensión 3: Eficiencia -->
-                        <div class="p-5 border-l-4 border-purple-500 bg-purple-50/50 rounded-r-lg">
-                            <h4 class="font-bold text-purple-800 mb-3 text-lg">3. Eficiencia Algorítmica y Optimización (Nivel Avanzado)</h4>
-                            <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                                ${stepGrade.eficiencia.length > 0 ? stepGrade.eficiencia.map(r => `<li>${r}</li>`).join('') : '<li class="text-green-700 font-medium"><i class="fas fa-check-circle mr-1"></i>Sobresaliente. Capacidad analítica superior para crear código robusto a nivel de bits.</li>'}
-                            </ul>
-                        </div>
-                    </div>
+            <!-- Detalles Metodológicos -->
+            <text x="250" y="530" class="tag-text">Clinical Domain</text>
+            <text x="250" y="555" class="detail-text">8 primary MDD symptoms</text>
+            <text x="250" y="580" class="detail-text">Synonym dictionaries</text>
 
-                    <div class="mt-10 p-4 bg-gray-100 text-gray-500 rounded-lg text-center print-only text-xs uppercase tracking-wider font-semibold">
-                        Documento generado automáticamente por sistema. ID: ${Date.now().toString(16).toUpperCase()}
-                    </div>
-                </div>
-            `;
-            document.getElementById('vista-reporte').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            <line x1="325" y1="450" x2="380" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
 
-            // --- TRANSMISIÓN A GOOGLE SHEETS ---
-            const payload = {
-                nombre: state.alumno.nombre,
-                matricula: state.alumno.matricula,
-                serie: state.alumno.serie,
-                aciertos: score,
-                calificacion: porcentaje.toFixed(1) + '%',
-                tiempo: formatearTiempo(state.seguridad.minutos, state.seguridad.segundos),
-                salidasPestaña: state.seguridad.salidas
-            };
+            <!-- Bloque Ontology (PHQ-8) -->
+            <rect x="385" y="400" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
+            <g transform="translate(470, 435)">
+                <circle cx="0" cy="-8" r="4" fill="#008080" />
+                <circle cx="-10" cy="8" r="4" fill="#008080" />
+                <circle cx="10" cy="8" r="4" fill="#008080" />
+                <line x1="0" y1="-8" x2="-10" y2="8" stroke="#008080" stroke-width="2.5" />
+                <line x1="0" y1="-8" x2="10" y2="8" stroke="#008080" stroke-width="2.5" />
+                <line x1="-10" y1="8" x2="10" y2="8" stroke="#008080" stroke-width="2.5" />
+            </g>
+            <text x="470" y="485" class="block-text">Ontology (PHQ-8)</text>
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                showToast("✅ Resultados sincronizados exitosamente con el Profesor.", "success");
-            }).catch(e => {
-                showToast("Fallo de red. Descargue su PDF como respaldo y envíelo a su profesor.", "error");
-            });
-        }
-    };
-})();
+            <!-- Detalles Metodológicos -->
+            <text x="470" y="530" class="tag-text">Symptom Keyword Mapping</text>
+            <text x="470" y="555" class="detail-text">Context-aware negation filter</text>
+            <text x="470" y="580" class="detail-text">(3-word preceding window)</text>
+
+            <line x1="555" y1="450" x2="610" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Bloque Node2Vec / DeepWalk -->
+            <rect x="615" y="410" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
+            <text x="747.5" y="458" class="model-text">Node2Vec / DeepWalk</text>
+            
+            <!-- Detalles Metodológicos -->
+            <text x="747.5" y="530" class="tag-text">128-d Semantic Embedding</text>
+            <text x="747.5" y="555" class="detail-text">w-Node2Vec / w-DeepWalk (w-)</text>
+            <text x="747.5" y="580" class="detail-text">Edge-weighting by clinical severity</text>
+
+            <!-- Flecha a Sigma -->
+            <line x1="880" y1="450" x2="940" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+        </g>
+
+
+        <!-- ========================================== -->
+        <!-- FILA 3: AUDIO (Azul Pizarra #31708F)       -->
+        <!-- ========================================== -->
+        <g id="row3-audio">
+            <!-- Bloque Audio Signal -->
+            <rect x="175" y="610" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
+            <g transform="translate(250, 645)">
+                <line x1="-12" y1="-5" x2="-12" y2="5" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="-4" y1="-12" x2="-4" y2="12" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="4" y1="-7" x2="4" y2="7" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
+                <line x1="12" y1="-15" x2="12" y2="15" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
+            </g>
+            <text x="250" y="695" class="block-text">Audio Signal</text>
+
+            <line x1="325" y1="660" x2="380" y2="660" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Bloque Preprocessing (Audio) -->
+            <rect x="385" y="610" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
+            <g transform="translate(470, 645)">
+                <circle cx="0" cy="0" r="7" fill="none" stroke="#31708F" stroke-width="2.5"/>
+                <circle cx="0" cy="0" r="2" fill="none" stroke="#31708F" stroke-width="2.5"/>
+                <path d="M 0 -7 L 0 -10 M 5 -5 L 7 -7 M 7 0 L 10 0 M 5 5 L 7 7 M 0 7 L 0 10 M -5 5 L -7 7 M -7 0 L -10 0 M -5 -5 L -7 -7" stroke="#31708F" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <text x="470" y="695" class="block-text">Preprocessing</text>
+
+            <!-- Detalles Metodológicos -->
+            <text x="470" y="740" class="tag-text">Signal Conditioning</text>
+            <text x="470" y="765" class="detail-text">Resample 16 kHz, 10s chunks</text>
+            <text x="470" y="790" class="detail-text">Remove interviewer, spectral gate</text>
+
+            <line x1="555" y1="660" x2="610" y2="660" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Bloque Wav2Vec 2.0 -->
+            <rect x="615" y="620" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
+            <text x="747.5" y="668" class="model-text">Wav2Vec 2.0</text>
+            
+            <!-- Detalles Metodológicos -->
+            <text x="747.5" y="740" class="tag-text">Acoustic Embedding</text>
+            <text x="747.5" y="765" class="detail-text">Mean (1024-d) / Ext. Stats (3072-d)</text>
+            <text x="747.5" y="790" class="detail-text">PCA Reduced (95% variance)</text>
+
+            <!-- Flecha a Sigma -->
+            <path d="M 880 660 C 920 660, 920 460, 940 460" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+        </g>
+
+
+        <!-- ========================================== -->
+        <!-- FASE 3: FUSIÓN & CLASIFICACIÓN             -->
+        <!-- ========================================== -->
+        <g id="phase3-fusion">
+            
+            <!-- Bloque Multimodal Fusion (Sigma) -->
+            <rect x="945" y="400" width="190" height="100" rx="6" fill="#FFFFFF" stroke="#495057" stroke-width="2.5" />
+            <text x="990" y="468" font-family="'Times New Roman', serif" font-size="64" font-weight="bold" fill="#495057" text-anchor="middle">Σ</text>
+            <text x="1075" y="442" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Multimodal</text>
+            <text x="1075" y="472" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Fusion</text>
+
+            <!-- Detalles Metodológicos -->
+            <text x="1040" y="530" class="tag-text">Integration Strategy</text>
+            <text x="1040" y="555" class="detail-text">Early Fusion + PCA</text>
+            <text x="1040" y="580" class="detail-text"></text>
+
+            <!-- Conexión a MLP -->
+            <line x1="1135" y1="450" x2="1170" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
+
+            <!-- Bloque MLP Classifier -->
+            <rect x="1175" y="410" width="210" height="80" rx="6" fill="#FFFFFF" stroke="#495057" stroke-width="2.5" />
+            <text x="1280" y="445" font-size="20" font-weight="700" fill="#212529" text-anchor="middle">MLP / Gated MLP</text>
+            <text x="1280" y="472" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Classifier</text>
+
+            <!-- Detalles Metodológicos -->
+            <text x="1280" y="530" class="tag-text">Network Architecture</text>
+            <text x="1280" y="555" class="detail-text">2 Hidden Layers (256, 128)</text>
+            <text x="1280" y="580" class="detail-text">Batch Norm, Weighted CE Loss</text>
+
+            <!-- Bifurcaciones hacia Resultados -->
+            <path d="M 1385 450 L 1400 450 L 1400 380 L 1405 380" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" stroke-linejoin="round"/>
+            <path d="M 1385 450 L 1400 450 L 1400 520 L 1405 520" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" stroke-linejoin="round"/>
+
+            <!-- Nodo de Resultado: Non-Depressed -->
+            <rect x="1410" y="340" width="175" height="80" rx="6" fill="#D1E7DD" stroke="#198754" stroke-width="2.5" />
+            <text x="1497.5" y="388" class="outcome-text" fill="#0F5132">Non-Depressed</text>
+
+            <!-- Nodo de Resultado: Depressed -->
+            <rect x="1410" y="480" width="175" height="80" rx="6" fill="#F8D7DA" stroke="#DC3545" stroke-width="2.5" />
+            <text x="1497.5" y="528" class="outcome-text" fill="#842029">Depressed</text>
+
+        </g>
+    </svg>
+</div>
+
+<!-- Script para renderizar el SVG y descargarlo como PNG -->
+<script>
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        const svgElement = document.querySelector('.poster-container > svg');
+        const serializer = new XMLSerializer();
+        let svgString = serializer.serializeToString(svgElement);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 1600;
+        canvas.height = 900;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const img = new Image();
+        const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(url);
+            const imgURI = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.download = 'Pipeline_Depression_Detection.png';
+            a.href = imgURI;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+        img.src = url;
+    });
 </script>
+
 </body>
 </html>
