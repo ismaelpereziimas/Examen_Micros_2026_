@@ -1,370 +1,297 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multimodal Depression-Detection Pipeline - IEEE Poster Style</title>
+    <title>Examen Extraordinario - Microcontroladores (Mecatrónica)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Estilos generales para centrar el póster en la ventana */
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #e2e8f0; 
-            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
-        .poster-container {
-            width: 100%;
-            max-width: 1600px;
-            background-color: #ffffff;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .code-font { font-family: 'Fira Code', monospace; }
         
-        /* Ajustado para no afectar al ícono del botón */
-        .poster-container > svg {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast { animation: slideIn 0.3s ease-out forwards; }
+        .toast.hiding { animation: fadeOut 0.5s ease-out forwards; }
 
-        /* Estilos del botón flotante */
-        .download-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background-color: #0056B3;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: background-color 0.3s;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .download-btn:hover {
-            background-color: #004494;
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .container { box-shadow: none; max-width: 100%; padding: 0; }
         }
     </style>
 </head>
-<body>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-<!-- Botón flotante de descarga -->
-<button id="downloadBtn" class="download-btn">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-    </svg>
-    Descargar PNG
-</button>
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-<div class="poster-container">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
-        <defs>
-            <!-- Tipografía limpia y formal para impresión (Google Fonts Roboto) -->
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
-                text { font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif; }
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div id="app-card" class="bg-white rounded-xl shadow-lg w-full max-w-5xl p-6 md:p-10 transition-all duration-300">
+            
+            <div class="text-center mb-8 border-b pb-4">
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-800">Evaluación Extraordinaria: Microcontroladores</h1>
+                <p class="text-gray-500 mt-2">Ingeniería Mecatrónica - Firmware C y Hardware</p>
+                <div id="examen-meta" class="hidden mt-4 flex flex-wrap justify-center gap-4 md:gap-6 text-sm font-semibold text-gray-600 bg-gray-50 p-3 rounded-lg">
+                    <span id="display-serie"><i class="fas fa-file-alt text-blue-500"></i> Serie: -</span>
+                    <span id="display-time"><i class="fas fa-clock text-green-500"></i> Tiempo: 00:00</span>
+                    <span id="display-warnings" class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Infracciones: 0</span>
+                </div>
+            </div>
+
+            <div id="vista-registro" class="block">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r">
+                    <div class="flex">
+                        <div class="flex-shrink-0"><i class="fas fa-info-circle text-yellow-400"></i></div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                <strong>Reglas de Integridad (Obligatorias):</strong><br>
+                                1. El sistema registrará salidas de pestaña.<br>
+                                2. El examen consta de 33 reactivos (32 de 3 pts y 1 de 4 pts).<br>
+                                3. Calificación neta calculada sobre 100 puntos brutos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 max-w-md mx-auto">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                        <input type="text" id="alumno-nombre" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Apellidos y Nombres">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Matrícula</label>
+                        <input type="text" id="alumno-matricula" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Ej. 18020010">
+                    </div>
+                    <button onclick="app.iniciar()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-6 shadow-md">
+                        <i class="fas fa-play mr-2"></i> Iniciar Evaluación (100 Pts)
+                    </button>
+                </div>
+            </div>
+
+            <div id="vista-examen" class="hidden">
+                <div id="contenedor-preguntas" class="space-y-6"></div>
                 
-                /* Clases tipográficas para mantener jerarquía visual - TAMAÑOS AUMENTADOS */
-                .phase-title { font-size: 24px; font-weight: 900; fill: #495057; letter-spacing: 1.5px; }
-                .phase-subtitle { font-size: 26px; font-weight: 700; fill: #212529; }
-                .input-title { font-size: 26px; font-weight: 900; fill: #212529; }
-                .input-text { font-size: 20px; font-weight: 500; fill: #343A40; }
-                .input-sub { font-size: 18px; font-weight: 400; fill: #6C757D; }
-                
-                .block-text { font-size: 20px; font-weight: 700; fill: #212529; text-anchor: middle; }
-                .model-text { font-size: 24px; font-weight: 700; fill: #212529; text-anchor: middle; }
-                
-                /* Nuevos estilos para la metodología detallada - TAMAÑOS AUMENTADOS */
-                .tag-text { font-size: 18px; font-weight: 700; fill: #495057; text-anchor: middle; }
-                .detail-text { font-size: 16px; font-weight: 400; fill: #6C757D; text-anchor: middle; }
-                
-                .outcome-text { font-size: 24px; font-weight: 700; text-anchor: middle; }
-            </style>
+                <div class="mt-10 pt-6 border-t flex justify-end">
+                    <button onclick="app.entregar()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors text-lg shadow-md">
+                        <i class="fas fa-paper-plane mr-2"></i> Entregar Examen
+                    </button>
+                </div>
+            </div>
 
-            <!-- Flecha gris sólida (Estándar académico) -->
-            <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#6C757D" />
-            </marker>
-        </defs>
+            <div id="vista-reporte" class="hidden">
+                <div id="reporte-contenido"></div>
+                <div class="mt-8 flex justify-center gap-4 no-print">
+                    <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-6 rounded-lg transition-colors shadow">
+                        <i class="fas fa-file-pdf mr-2"></i> Guardar PDF
+                    </button>
+                    <button onclick="location.reload()" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2 px-6 rounded-lg transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Finalizar
+                    </button>
+                </div>
+            </div>
 
-        <!-- Fondo del canvas del póster: Blanco Puro -->
-        <rect width="1600" height="900" fill="#FFFFFF" />
+        </div>
+    </main>
 
-        <!-- ========================================== -->
-        <!-- CONTENEDORES DE LAS FASES (Grises neutros) -->
-        <!-- ========================================== -->
-        
-        <!-- Panel de Input -->
-        <rect x="15" y="80" width="135" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
-        <rect x="15" y="80" width="135" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
-        <text x="82.5" y="118" text-anchor="middle" class="input-title">INPUT</text>
-        
-        <text x="82.5" y="380" text-anchor="middle" class="input-text">DAIC-WOZ</text>
-        <text x="82.5" y="405" text-anchor="middle" class="input-text">dataset</text>
-        <text x="82.5" y="435" text-anchor="middle" class="input-text">—</text>
-        <text x="82.5" y="465" text-anchor="middle" class="input-text">189 clinical</text>
-        <text x="82.5" y="490" text-anchor="middle" class="input-text">interviews</text>
-        <text x="82.5" y="530" text-anchor="middle" class="input-sub">(transcripts</text>
-        <text x="82.5" y="555" text-anchor="middle" class="input-sub">+ audio)</text>
-
-        <!-- Phase 1 Panel -->
-        <rect x="160" y="80" width="410" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
-        <rect x="160" y="80" width="410" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
-        <text x="365" y="107" text-anchor="middle" class="phase-title">PHASE 1</text>
-        <text x="365" y="132" text-anchor="middle" class="phase-subtitle">DATA ACQ. &amp; PREPROCESSING</text>
-
-        <!-- Phase 2 Panel -->
-        <rect x="580" y="80" width="335" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
-        <rect x="580" y="80" width="335" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
-        <text x="747.5" y="107" text-anchor="middle" class="phase-title">PHASE 2</text>
-        <text x="747.5" y="132" text-anchor="middle" class="phase-subtitle">FEATURE EXTRACTION</text>
-
-        <!-- Phase 3 Panel -->
-        <rect x="925" y="80" width="660" height="780" fill="#F8F9FA" stroke="#DEE2E6" stroke-width="2" />
-        <rect x="925" y="80" width="660" height="60" fill="#E9ECEF" stroke="#DEE2E6" stroke-width="2" />
-        <text x="1255" y="107" text-anchor="middle" class="phase-title">PHASE 3</text>
-        <text x="1255" y="132" text-anchor="middle" class="phase-subtitle">FUSION &amp; CLASSIFICATION</text>
-
-
-        <!-- ========================================== -->
-        <!-- FILA 1: TEXTO (Azul Institucional #0056B3) -->
-        <!-- ========================================== -->
-        <g id="row1-text">
-            <!-- Bloque Transcripts -->
-            <rect x="175" y="190" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
-            <g transform="translate(250, 225)">
-                <rect x="-10" y="-12" width="20" height="24" rx="2" fill="none" stroke="#0056B3" stroke-width="2.5" />
-                <line x1="-5" y1="-6" x2="5" y2="-6" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="-5" y1="0" x2="5" y2="0" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="-5" y1="6" x2="2" y2="6" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-            <text x="250" y="275" class="block-text">Transcripts</text>
-
-            <line x1="325" y1="240" x2="380" y2="240" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque Preprocessing (Texto) -->
-            <rect x="385" y="190" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
-            <g transform="translate(470, 225)">
-                <circle cx="0" cy="0" r="7" fill="none" stroke="#0056B3" stroke-width="2.5"/>
-                <circle cx="0" cy="0" r="2" fill="none" stroke="#0056B3" stroke-width="2.5"/>
-                <path d="M 0 -7 L 0 -10 M 5 -5 L 7 -7 M 7 0 L 10 0 M 5 5 L 7 7 M 0 7 L 0 10 M -5 5 L -7 7 M -7 0 L -10 0 M -5 -5 L -7 -7" stroke="#0056B3" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-            <text x="470" y="275" class="block-text">Preprocessing</text>
-            
-            <!-- Detalles Metodológicos -->
-            <text x="470" y="315" class="tag-text">Text Conditioning</text>
-            <text x="470" y="340" class="detail-text">Lowercase, noise/fillers filtering</text>
-            <text x="470" y="365" class="detail-text">512-token sequence windows</text>
-
-            <!-- Flecha de Texto a Ontología (Mapeo de Keywords) -->
-            <line x1="470" y1="380" x2="470" y2="395" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <line x1="555" y1="240" x2="610" y2="240" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque BioBERT -->
-            <rect x="615" y="200" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#0056B3" stroke-width="2.5" />
-            <text x="747.5" y="248" class="model-text">BioBERT</text>
-            
-            <!-- Detalles Metodológicos -->
-            <text x="747.5" y="315" class="tag-text">768-d Contextual Embedding</text>
-            <text x="747.5" y="340" class="detail-text">Base Extractor &amp; Fine-Tuned (FT)</text>
-            <text x="747.5" y="365" class="detail-text">Adam optimizer, Dropout (0.5)</text>
-
-            <!-- Flecha a Sigma -->
-            <path d="M 880 240 C 920 240, 920 440, 940 440" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-        </g>
-
-
-        <!-- ========================================== -->
-        <!-- FILA 2: ONTOLOGÍA (Cerceta/Teal #008080)   -->
-        <!-- ========================================== -->
-        <g id="row2-ontology">
-            <!-- Bloque PHQ-8 Knowledge Base -->
-            <rect x="175" y="400" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
-            <g transform="translate(250, 435)">
-                <rect x="-8" y="-10" width="16" height="20" rx="2" fill="none" stroke="#008080" stroke-width="2.5"/>
-                <line x1="-4" y1="-2" x2="4" y2="-2" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="-4" y1="4" x2="4" y2="4" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M -4 -10 V -12 A 2 2 0 0 1 4 -12 V -10" fill="none" stroke="#008080" stroke-width="2.5"/>
-            </g>
-            <text x="250" y="485" class="block-text">PHQ-8 Criteria</text>
-
-            <!-- Detalles Metodológicos -->
-            <text x="250" y="530" class="tag-text">Clinical Domain</text>
-            <text x="250" y="555" class="detail-text">8 primary MDD symptoms</text>
-            <text x="250" y="580" class="detail-text">Synonym dictionaries</text>
-
-            <line x1="325" y1="450" x2="380" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque Ontology (PHQ-8) -->
-            <rect x="385" y="400" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
-            <g transform="translate(470, 435)">
-                <circle cx="0" cy="-8" r="4" fill="#008080" />
-                <circle cx="-10" cy="8" r="4" fill="#008080" />
-                <circle cx="10" cy="8" r="4" fill="#008080" />
-                <line x1="0" y1="-8" x2="-10" y2="8" stroke="#008080" stroke-width="2.5" />
-                <line x1="0" y1="-8" x2="10" y2="8" stroke="#008080" stroke-width="2.5" />
-                <line x1="-10" y1="8" x2="10" y2="8" stroke="#008080" stroke-width="2.5" />
-            </g>
-            <text x="470" y="485" class="block-text">Ontology (PHQ-8)</text>
-
-            <!-- Detalles Metodológicos -->
-            <text x="470" y="530" class="tag-text">Symptom Keyword Mapping</text>
-            <text x="470" y="555" class="detail-text">Context-aware negation filter</text>
-            <text x="470" y="580" class="detail-text">(3-word preceding window)</text>
-
-            <line x1="555" y1="450" x2="610" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque Node2Vec / DeepWalk -->
-            <rect x="615" y="410" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#008080" stroke-width="2.5" />
-            <text x="747.5" y="458" class="model-text">Node2Vec / DeepWalk</text>
-            
-            <!-- Detalles Metodológicos -->
-            <text x="747.5" y="530" class="tag-text">128-d Semantic Embedding</text>
-            <text x="747.5" y="555" class="detail-text">w-Node2Vec / w-DeepWalk (w-)</text>
-            <text x="747.5" y="580" class="detail-text">Edge-weighting by clinical severity</text>
-
-            <!-- Flecha a Sigma -->
-            <line x1="880" y1="450" x2="940" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-        </g>
-
-
-        <!-- ========================================== -->
-        <!-- FILA 3: AUDIO (Azul Pizarra #31708F)       -->
-        <!-- ========================================== -->
-        <g id="row3-audio">
-            <!-- Bloque Audio Signal -->
-            <rect x="175" y="610" width="150" height="100" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
-            <g transform="translate(250, 645)">
-                <line x1="-12" y1="-5" x2="-12" y2="5" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
-                <line x1="-4" y1="-12" x2="-4" y2="12" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
-                <line x1="4" y1="-7" x2="4" y2="7" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
-                <line x1="12" y1="-15" x2="12" y2="15" stroke="#31708F" stroke-width="3" stroke-linecap="round"/>
-            </g>
-            <text x="250" y="695" class="block-text">Audio Signal</text>
-
-            <line x1="325" y1="660" x2="380" y2="660" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque Preprocessing (Audio) -->
-            <rect x="385" y="610" width="170" height="100" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
-            <g transform="translate(470, 645)">
-                <circle cx="0" cy="0" r="7" fill="none" stroke="#31708F" stroke-width="2.5"/>
-                <circle cx="0" cy="0" r="2" fill="none" stroke="#31708F" stroke-width="2.5"/>
-                <path d="M 0 -7 L 0 -10 M 5 -5 L 7 -7 M 7 0 L 10 0 M 5 5 L 7 7 M 0 7 L 0 10 M -5 5 L -7 7 M -7 0 L -10 0 M -5 -5 L -7 -7" stroke="#31708F" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
-            <text x="470" y="695" class="block-text">Preprocessing</text>
-
-            <!-- Detalles Metodológicos -->
-            <text x="470" y="740" class="tag-text">Signal Conditioning</text>
-            <text x="470" y="765" class="detail-text">Resample 16 kHz, 10s chunks</text>
-            <text x="470" y="790" class="detail-text">Remove interviewer, spectral gate</text>
-
-            <line x1="555" y1="660" x2="610" y2="660" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque Wav2Vec 2.0 -->
-            <rect x="615" y="620" width="265" height="80" rx="6" fill="#FFFFFF" stroke="#31708F" stroke-width="2.5" />
-            <text x="747.5" y="668" class="model-text">Wav2Vec 2.0</text>
-            
-            <!-- Detalles Metodológicos -->
-            <text x="747.5" y="740" class="tag-text">Acoustic Embedding</text>
-            <text x="747.5" y="765" class="detail-text">Mean (1024-d) / Ext. Stats (3072-d)</text>
-            <text x="747.5" y="790" class="detail-text">PCA Reduced (95% variance)</text>
-
-            <!-- Flecha a Sigma -->
-            <path d="M 880 660 C 920 660, 920 460, 940 460" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-        </g>
-
-
-        <!-- ========================================== -->
-        <!-- FASE 3: FUSIÓN & CLASIFICACIÓN             -->
-        <!-- ========================================== -->
-        <g id="phase3-fusion">
-            
-            <!-- Bloque Multimodal Fusion (Sigma) -->
-            <rect x="945" y="400" width="190" height="100" rx="6" fill="#FFFFFF" stroke="#495057" stroke-width="2.5" />
-            <text x="990" y="468" font-family="'Times New Roman', serif" font-size="64" font-weight="bold" fill="#495057" text-anchor="middle">Σ</text>
-            <text x="1075" y="442" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Multimodal</text>
-            <text x="1075" y="472" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Fusion</text>
-
-            <!-- Detalles Metodológicos -->
-            <text x="1040" y="530" class="tag-text">Integration Strategy</text>
-            <text x="1040" y="555" class="detail-text">Early Fusion + PCA</text>
-            <text x="1040" y="580" class="detail-text"></text>
-
-            <!-- Conexión a MLP -->
-            <line x1="1135" y1="450" x2="1170" y2="450" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" />
-
-            <!-- Bloque MLP Classifier -->
-            <rect x="1175" y="410" width="210" height="80" rx="6" fill="#FFFFFF" stroke="#495057" stroke-width="2.5" />
-            <text x="1280" y="445" font-size="20" font-weight="700" fill="#212529" text-anchor="middle">MLP / Gated MLP</text>
-            <text x="1280" y="472" font-size="22" font-weight="700" fill="#212529" text-anchor="middle">Classifier</text>
-
-            <!-- Detalles Metodológicos -->
-            <text x="1280" y="530" class="tag-text">Network Architecture</text>
-            <text x="1280" y="555" class="detail-text">2 Hidden Layers (256, 128)</text>
-            <text x="1280" y="580" class="detail-text">Batch Norm, Weighted CE Loss</text>
-
-            <!-- Bifurcaciones hacia Resultados -->
-            <path d="M 1385 450 L 1400 450 L 1400 380 L 1405 380" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" stroke-linejoin="round"/>
-            <path d="M 1385 450 L 1400 450 L 1400 520 L 1405 520" fill="none" stroke="#6C757D" stroke-width="3" marker-end="url(#arrow)" stroke-linejoin="round"/>
-
-            <!-- Nodo de Resultado: Non-Depressed -->
-            <rect x="1410" y="340" width="175" height="80" rx="6" fill="#D1E7DD" stroke="#198754" stroke-width="2.5" />
-            <text x="1497.5" y="388" class="outcome-text" fill="#0F5132">Non-Depressed</text>
-
-            <!-- Nodo de Resultado: Depressed -->
-            <rect x="1410" y="480" width="175" height="80" rx="6" fill="#F8D7DA" stroke="#DC3545" stroke-width="2.5" />
-            <text x="1497.5" y="528" class="outcome-text" fill="#842029">Depressed</text>
-
-        </g>
-    </svg>
-</div>
-
-<!-- Script para renderizar el SVG y descargarlo como PNG -->
 <script>
-    document.getElementById('downloadBtn').addEventListener('click', function() {
-        const svgElement = document.querySelector('.poster-container > svg');
-        const serializer = new XMLSerializer();
-        let svgString = serializer.serializeToString(svgElement);
+const app = (function() {
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQFilJTBT7_qBDXlThxC89VYeOY0Gt8hCqIoGkqBMPHog_GIra4cYJ2gYJZtPO1JCY/exec';
 
-        const canvas = document.createElement('canvas');
-        canvas.width = 1600;
-        canvas.height = 900;
-        const ctx = canvas.getContext('2d');
+    const state = {
+        alumno: { nombre: '', matricula: '', serie: '' },
+        seguridad: { salidas: 0, tiempoInicio: null, intervaloTimer: null, min: 0, seg: 0 },
+        preguntasActivas: []
+    };
 
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // BANCO MAESTRO: 32 de 3 pts + 1 de 4 pts = 100 pts.
+    const bm = [
+        { id: 'q1', n: 1, type: 'radio', pts: 3, ctx: 'Sensores en Robótica: Un brazo robótico usa un encoder absoluto de 14 bits.', text: '¿Qué tipo de dato de ancho fijo de <stdint.h> optimiza la memoria sin perder resolución?', opts: ['uint8_t', 'int8_t', 'uint16_t', 'float'], ans: 2, ret: 'Un valor de 14 bits llega a 16383. Se requiere uint16_t (0-65535).' },
+        { id: 'q2', n: 1, type: 'radio', pts: 3, ctx: 'Cinta Transportadora: Toda la lógica de clasificación está en la función main().', text: '¿Por qué es obligatorio contener la lógica industrial en un ciclo while(1)?', opts: ['Para no apagar el motor paso a paso.', 'En MCUs no hay SO; salir de main() causa comportamiento indefinido o reinicio fatal.', 'Para evitar el sobrecalentamiento del CPU.', 'Es solo una buena práctica estética.'], ans: 1, ret: 'En sistemas bare-metal, no se debe salir de main().' },
+        { id: 'q3', n: 1, type: 'radio', pts: 3, ctx: 'Control PID de Dron: Se define uint16_t arreglo_IMU[10];', text: 'Si un bucle intenta guardar un dato en arreglo_IMU[10], ¿qué sucede?', opts: ['Se redimensiona dinámicamente.', 'Desbordamiento de arreglo (Buffer overflow), corrompiendo memoria RAM.', 'El compilador lo corrige.', 'Se sobrescribe el índice 0 automáticamente.'], ans: 1, ret: 'Los índices van del 0 al 9. Acceder al 10 causa corrupción de memoria adyacente.' },
+        { id: 'q4', n: 2, type: 'radio', pts: 3, ctx: 'Protocolo I2C: Enviar variable uint32_t encoder_pos = 0xAABBCCDD a un PLC.', text: '¿Cómo fuerzas al compilador a leer la memoria byte por byte?', opts: ['uint8_t *ptr = (uint8_t*)&encoder_pos;', 'int ptr = &encoder_pos / 4;', 'char ptr[] = encoder_pos;', 'float *ptr = &encoder_pos;'], ans: 0, ret: 'Castear el puntero a uint8_t* permite enviar datos grandes byte a byte por buses seriales.' },
+        { id: 'q5', n: 2, type: 'radio', pts: 3, ctx: 'Funciones HMI: Llama a limpiarPantalla(int comando).', text: 'Al pasar la variable por valor, ¿qué sucede si la función modifica "comando"?', opts: ['Modifica el registro físico.', 'La variable original fuera de la función no cambia, solo su copia en el Stack.', 'La memoria Flash se actualiza.', 'Lanza un error de segmentación.'], ans: 1, ret: 'El paso por valor no altera la variable original. Para alterarla se requieren punteros.' },
+        { id: 'q6', n: 2, type: 'radio', pts: 3, ctx: 'Arquitectura de Firmware CNC: Se requiere crear menús dinámicos en un LCD.', text: '¿Cuál es el peligro de usar malloc() repetidamente en un MCU?', opts: ['Reduce el voltaje de GPIOs.', 'Apaga el Watchdog Timer.', 'Causa fragmentación del Heap, dejando al MCU sin memoria RAM utilizable.', 'Es un proceso muy rápido que satura el bus I2C.'], ans: 2, ret: 'La fragmentación del Heap en embebidos sin SO causa congelamientos del hardware.' },
+        { id: 'q7', n: 2, type: 'radio', pts: 3, ctx: 'Interrupciones en Servo (PIC18): Tienes una variable global que se altera en el bucle y en una interrupción.', text: '¿Qué palabra reservada debes usar para evitar que el compilador optimice la lectura?', opts: ['static', 'const', 'volatile', 'register'], ans: 2, ret: 'La palabra volatile obliga al CPU a leer directamente de la RAM, vital en interrupciones.' },
+        { id: 'q8', n: 3, type: 'radio', pts: 3, ctx: 'Mapeo Analógico a PWM: Un joystick devuelve de 0 a 1023 (10-bit).', text: 'Para enviarlo directo a un actuador PWM de 8-bit (0-255), ¿qué operación entera básica simula map()?', opts: ['Multiplicar por 4', 'Restar 768', 'Dividir entre 4', 'Elevar al cuadrado'], ans: 2, ret: '1023 / 4 es aproximadamente 255. Permite una conversión entera y rápida de 10 a 8 bits.' },
+        { id: 'q9', n: 1, type: 'radio', pts: 3, ctx: 'Mantenimiento de Motores: Necesitas leer la bandera de Timer0 en el registro INTCON.', text: 'El operador bit a bit lógico AND sirve para ENMASCARAR (comprobar) un bit. ¿Cuál es su símbolo?', opts: ['||', '&', '|', '<<'], ans: 1, ret: 'El ampersand simple (&) realiza AND bit a bit.' },
+        { id: 'q10', n: 3, type: 'radio', pts: 3, ctx: 'Controlador PID:', text: 'Para la velocidad de procesamiento (MCU sin FPU), ¿qué tipo de matemáticas se prefieren?', opts: ['Aritmética de punto flotante (float/double)', 'Aritmética entera escalada (int16_t/uint32_t)', 'Matrices dinámicas', 'Operaciones con Strings'], ans: 1, ret: 'La aritmética entera es exponencialmente más rápida y consume menos memoria.' },
+        { id: 'q11', n: 2, type: 'radio', pts: 3, ctx: 'Botones Industriales: Falsos positivos por vibración del contacto físico.', text: '¿Cómo se llama la técnica en C para evitar múltiples lecturas erróneas?', opts: ['Overclocking', 'Antirrebote (Debouncing)', 'Polling', 'Bit-banging'], ans: 1, ret: 'El antirrebote filtra el ruido mecánico asegurando transiciones limpias de lógica.' },
+        { id: 'q12', n: 1, type: 'radio', pts: 3, ctx: 'Migración ASM a C: Analizas BTFSS PORTB,0 (Skip if Set).', text: 'En lenguaje C, ¿qué operador lógico representa la negación que evalúa "si el bit es 0"?', opts: ['=', '!', '+', '<<'], ans: 1, ret: 'El operador NOT (!) invierte el valor lógico (0 se vuelve True).' },
+        { id: 'q13', n: 2, type: 'radio', pts: 3, ctx: 'Lectura Endianness: En microcontroladores ARM (Little-Endian).', text: 'Al leer con punteros de 8 bits una variable de 32 bits, ¿cuál byte se lee en la primera dirección?', opts: ['El más significativo (MSB)', 'El menos significativo (LSB)', 'Un byte aleatorio', 'El Checksum'], ans: 1, ret: 'Little-endian almacena el byte menos significativo en la dirección de memoria más baja.' },
+        { id: 'q14', n: 1, type: 'radio', pts: 3, ctx: 'Memoria ROM: Las constantes de calibración de fábrica no cambiarán jamás.', text: '¿Qué modificador ubica la variable en la memoria de programa (Flash/ROM) en lugar de RAM?', opts: ['volatile', 'extern', 'const', 'static'], ans: 2, ret: 'const permite ahorrar preciada memoria SRAM colocando datos fijos en la Flash.' },
+        { id: 'q15', n: 1, type: 'radio', pts: 3, ctx: 'Pines de I/O en PIC18:', text: '¿Qué registro establece la dirección física del pin (Entrada vs Salida)?', opts: ['PORTA', 'LATA', 'TRISA', 'ADCON1'], ans: 2, ret: 'TRIS (Tri-State) configura si el pin funciona como Input (1) o Output (0).' },
+        { id: 'q16', n: 1, type: 'radio', pts: 3, ctx: 'Prioridad de Interrupciones: En el archivo ASM se usa BSF RCON, IPEN.', text: '¿Qué permite este bit IPEN en un PIC18?', opts: ['Habilitar el ADC', 'Habilitar prioridades alta/baja de interrupciones', 'Encender el Timer0', 'Resetear el MCU'], ans: 1, ret: 'IPEN habilita el modelo de interrupciones vectorizadas de 2 niveles (High/Low priority).' },
+        { id: 'q17', n: 2, type: 'radio', pts: 3, ctx: 'Temporizadores Hardware vs NOPs:', text: '¿Por qué es superior usar Timer0 vs retardos generados por bucles/NOPs?', opts: ['Porque Timer0 requiere FPU.', 'Porque bucles bloquean el CPU, mientras el Timer cuenta asíncronamente en hardware.', 'Porque los NOPs consumen RAM.', 'No hay diferencia técnica.'], ans: 1, ret: 'Los retardos por software (blocking delay) congelan el programa. Los Timers corren en segundo plano.' },
+        { id: 'q18', n: 2, type: 'radio', pts: 3, ctx: 'Pull-up Resistors: Botón de Paro conectado con pull-up interno.', text: 'Al presionarlo, ¿qué nivel lógico detecta el pin?', opts: ['HIGH (1 lógico)', 'LOW (0 lógico)', 'Alta impedancia', 'Onda cuadrada'], ans: 1, ret: 'Con pull-up, el pin está en 1 (Vcc) en reposo. Al pulsar, cierra a Tierra (0).' },
+        { id: 'q19', n: 1, type: 'radio', pts: 3, ctx: 'Punteros Colgantes: Retornas un puntero hacia una variable local declarada dentro de una función.', text: '¿Por qué esto colapsa el firmware?', opts: ['La variable local es destruida de la pila al salir de la función (Dangling Pointer).', 'Se enciende el ADC sin querer.', 'Causa cortocircuito en los pines.', 'El compilador exige que sea float.'], ans: 0, ret: 'Retornar punteros locales apunta a memoria basura que fue liberada del Stack.' },
+        { id: 'q20', n: 1, type: 'radio', pts: 3, ctx: 'Control de Tráfico AGV: Se necesita un switch-case.', text: '¿Qué comando detiene la evaluación hacia los casos inferiores?', opts: ['continue;', 'halt;', 'break;', 'return 0;'], ans: 2, ret: 'Sin el break, el flujo cae "en cascada" ejecutando accidentalmente todos los estados posteriores.' },
+        { id: 'q21', n: 2, type: 'radio', pts: 3, ctx: 'Aritmética Punteros: Tienes uint16_t sensor[5]; y uint16_t *ptr = sensor;', text: 'Si haces ptr++, ¿cuántos bytes avanza el apuntador en memoria SRAM?', opts: ['1 byte', '2 bytes', 'Ninguno', '4 bytes'], ans: 1, ret: 'El tipo base uint16_t ocupa 2 bytes. La aritmética de punteros avanza acorde al tamaño del tipo.' },
+        { id: 'q22', n: 1, type: 'radio', pts: 3, ctx: 'Reemplazo ADDWF:', text: 'En ASM, "ADDWF var, 0" suma var a W. En C, ¿cuál operador de asignación suma y guarda el resultado al mismo tiempo?', opts: ['+=', '&&', '++', '&='], ans: 0, ret: 'x += y suma y reasigna directamente (Read-Modify-Write).' },
+        { id: 'q23', n: 3, type: 'codigo', pts: 3, ctx: 'Módulo de Punteros: Para una función "void initSensor(int *ptrId)"', text: 'Pasa la dirección de memoria de la variable "id_sensor".', codigoBase: "initSensor(________id_sensor);", rx: /^&$/, ret: 'El ampersand (&) extrae la dirección de memoria.' },
+        { id: 'q24', n: 3, type: 'codigo', pts: 3, ctx: 'Sobrescribir Valor: Dentro de "void calibrar(int *ptrVar)".', text: 'Sobrescribe la variable apuntada con el valor 50 usando el operador de desreferencia.', codigoBase: "________ptrVar = 50;", rx: /^\*$/, ret: 'El asterisco (*) como operador unario entra a la celda de memoria.' },
+        { id: 'q25', n: 3, type: 'codigo', pts: 3, ctx: 'Máscara de Bits (SET): Encender el relevador bit 6 del PORTB.', text: 'Aplica operador de asignación OR a nivel de bits.', codigoBase: "PORTB ________ (1 << 6);", rx: /^\|=$/, ret: '|= fuerza a 1 el bit deseado preservando los demás.' },
+        { id: 'q26', n: 3, type: 'codigo', pts: 3, ctx: 'Máscara de Bits (CLEAR): Apagar sirena bit 2 de PORTC.', text: 'Aplica el estandar AND con NOT (complemento) para borrar el bit.', codigoBase: "PORTC ________ (1 << 2);", rx: /^&=\s*~$/, ret: '&= ~ es la máscara infalible para poner en cero lógico un pin del microcontrolador.' },
+        { id: 'q27', n: 3, type: 'codigo', pts: 3, ctx: 'Máscara de Bits (TOGGLE): Alternar polaridad motor paso a paso (bit 4 de PORTD).', text: 'Aplica el operador XOR compuesto a nivel de bits.', codigoBase: "PORTD ________ (1 << 4);", rx: /^\^=$/, ret: '^= invierte (toggle) exclusivamente el estado actual del bit.' },
+        { id: 'q28', n: 3, type: 'codigo', pts: 3, ctx: 'Structs CNC: Definir estructura de Eje Cartesiano.', text: 'Escribe la palabra clave.', codigoBase: "typedef ________ {\n int pos_x;\n int velocidad;\n} EjeCNC_t;", rx: /^struct$/i, ret: 'struct encapsula variables heterogéneas.' },
+        { id: 'q29', n: 3, type: 'codigo', pts: 3, ctx: 'Optimización de Multiplicación: Multiplicar lectura por 8 sin usar el operador *.', text: 'Usa el operador de desplazamiento a la izquierda.', codigoBase: "uint16_t vel = lectura ________ 3;", rx: /^<<$/, ret: 'Desplazar a la izquierda 3 posiciones (<< 3) multiplica velozmente por 8 a nivel hardware.' },
+        { id: 'q30', n: 3, type: 'codigo', pts: 3, ctx: 'Macros de Configuración: Definir el pin LED.', text: 'Usa la directiva de preprocesador para constantes.', codigoBase: "________ PIN_LED 5", rx: /^#define$/i, ret: '#define realiza sustitución de texto, sin usar memoria RAM en ejecución.' },
+        { id: 'q31', n: 3, type: 'codigo', pts: 3, ctx: 'Arreglos Estáticos: Crear cadena segura de contraseñas de teclado matricial.', text: 'Define el tipo nativo de 1 byte.', codigoBase: "________ buffer[10];", rx: /^char$/i, ret: 'Los arreglos de char son el estándar seguro para Strings en C embebido.' },
+        { id: 'q32', n: 3, type: 'codigo', pts: 3, ctx: 'Seguridad en Cabeceras: Evitar inclusión recursiva de un módulo Sensor.', text: 'Palabra clave de guardas (if not defined).', codigoBase: "________ SENSOR_H\n#define SENSOR_H", rx: /^#ifndef$/i, ret: '#ifndef protege contra redefiniciones conflictivas en proyectos multi-archivo.' },
+        { id: 'q33', n: 3, type: 'codigo', pts: 4, ctx: '[PREGUNTA INTEGRADORA] Acceso a Miembros por Puntero: Tienes `EjeCNC_t *ptrMotor`.', text: 'Por 4 Puntos: Escribe el operador "flecha" en C utilizado para acceder y asignar el valor 1200 al miembro `pos_x` de la estructura apuntada.', codigoBase: "ptrMotor________pos_x = 1200;", rx: /^->$/, ret: 'El operador flecha (->) combina de manera legible la desreferenciación (*) y el acceso a miembro (.).' }
+    ];
 
-        const img = new Image();
-        const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-        const url = URL.createObjectURL(svgBlob);
+    const showToast = (msg, type = 'info') => {
+        const bg = type === 'error' ? 'bg-red-500' : 'bg-green-500';
+        const t = document.createElement('div');
+        t.className = `toast ${bg} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`;
+        t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation' : 'fa-check'} text-xl"></i><span>${msg}</span>`;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => { t.classList.add('hiding'); setTimeout(() => t.remove(), 500); }, 3000);
+    };
 
-        img.onload = function() {
-            ctx.drawImage(img, 0, 0);
-            URL.revokeObjectURL(url);
-            const imgURI = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.download = 'Pipeline_Depression_Detection.png';
-            a.href = imgURI;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        };
-        img.src = url;
-    });
+    const formatearTiempo = (min, seg) => `${min.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
+
+    const render = () => {
+        const c = document.getElementById('contenedor-preguntas');
+        state.preguntasActivas.forEach((q, i) => {
+            let html = `
+            <div class="bg-white border rounded-xl p-5 shadow-sm hover:shadow-md transition">
+                <div class="flex justify-between items-center mb-3 border-b pb-2">
+                    <h3 class="font-bold text-gray-800">${i===32 ? '🌟 Reactivo Final Integrador' : 'Reactivo '+(i+1)} 
+                    <span class="text-sm font-normal text-blue-600 bg-blue-50 px-2 py-1 rounded ml-2">${q.pts} Pts</span></h3>
+                </div>
+                <div class="bg-gray-50 border-l-4 border-gray-400 p-3 mb-3 text-sm italic text-gray-600">${q.ctx}</div>
+                <p class="font-medium text-gray-800 mb-4">${q.text}</p>`;
+
+            if(q.type === 'radio') {
+                html += `<div class="space-y-2">`;
+                q.opts.forEach((o, j) => {
+                    html += `<label class="flex p-3 border rounded hover:bg-blue-50 cursor-pointer text-sm">
+                        <input type="radio" name="${q.id}" value="${j}" class="mt-0.5 text-blue-600"> <span class="ml-2">${o}</span>
+                    </label>`;
+                });
+                html += `</div>`;
+            } else {
+                const parts = q.codigoBase.split('________');
+                html += `
+                <div class="bg-gray-900 p-4 rounded flex items-center flex-wrap gap-2 text-sm shadow-inner">
+                    <code class="code-font text-green-400 whitespace-pre">${parts[0]||''}</code>
+                    <input type="text" id="${q.id}" class="code-font bg-gray-800 text-white border-b border-green-500 focus:outline-none focus:border-blue-400 px-2 text-center w-20" autocomplete="off" spellcheck="false">
+                    <code class="code-font text-green-400 whitespace-pre">${parts[1]||''}</code>
+                </div>`;
+            }
+            html += `</div>`;
+            c.innerHTML += html;
+        });
+    };
+
+    return {
+        iniciar: () => {
+            const n = document.getElementById('alumno-nombre').value.trim();
+            const m = document.getElementById('alumno-matricula').value.trim();
+            if(!n || !m) return showToast("Ingrese nombre y matrícula", "error");
+
+            state.alumno.nombre = n; state.alumno.matricula = m;
+            state.alumno.serie = ['A', 'B', 'C', 'D'][parseInt(m.replace(/\D/g, '').slice(-1) || '0') % 4];
+            state.preguntasActivas = [...bm];
+
+            document.getElementById('vista-registro').classList.add('hidden');
+            document.getElementById('vista-examen').classList.remove('hidden');
+            document.getElementById('examen-meta').classList.remove('hidden');
+            document.getElementById('display-serie').innerHTML = `<i class="fas fa-file-alt text-blue-500"></i> Serie: ${state.alumno.serie}`;
+
+            document.addEventListener('visibilitychange', () => {
+                if(document.hidden && !document.getElementById('vista-examen').classList.contains('hidden')) {
+                    state.seguridad.salidas++;
+                    document.getElementById('display-warnings').innerHTML = `<i class="fas fa-exclamation-triangle"></i> Infracciones: ${state.seguridad.salidas}`;
+                    showToast("Salida de pestaña detectada", "error");
+                }
+            });
+
+            state.seguridad.intervaloTimer = setInterval(() => {
+                state.seguridad.seg++;
+                if(state.seguridad.seg === 60) { state.seguridad.min++; state.seguridad.seg = 0; }
+                document.getElementById('display-time').innerHTML = `<i class="fas fa-clock text-green-500"></i> Tiempo: ${formatearTiempo(state.seguridad.min, state.seguridad.seg)}`;
+            }, 1000);
+
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast("Evaluación iniciada", "success");
+        },
+
+        entregar: () => {
+            if(!confirm("¿Enviar evaluación definitiva?")) return;
+            clearInterval(state.seguridad.intervaloTimer);
+
+            let score = 0;
+            let reportHtml = '';
+
+            state.preguntasActivas.forEach((q, idx) => {
+                let usrTxt = "Sin responder", corrTxt = "", ok = false;
+                if(q.type === 'radio') {
+                    const sel = document.querySelector(`input[name="${q.id}"]:checked`);
+                    if(sel) { usrTxt = q.opts[sel.value]; ok = (parseInt(sel.value) === q.ans); }
+                    corrTxt = q.opts[q.ans];
+                } else {
+                    const v = document.getElementById(q.id).value.trim();
+                    if(v) usrTxt = v;
+                    ok = q.rx.test(v.replace(/\s+/g, ''));
+                    corrTxt = (q.rx.toString().replace(/^\/\^?|\$?\/i?$/g, '').replace(/\\s\*/g, ' '));
+                }
+
+                if(ok) {
+                    score += q.pts;
+                } else {
+                    reportHtml += `
+                    <div class="mb-3 p-3 bg-red-50 border border-red-200 rounded text-sm">
+                        <p class="font-bold text-gray-800 mb-1">Reactivo ${idx+1}: <span class="font-normal">${q.text}</span></p>
+                        <p class="text-red-600"><span class="font-bold">Tú:</span> <span class="line-through">${usrTxt}</span></p>
+                        <p class="text-green-700 font-bold">Respuesta Correcta: ${corrTxt}</p>
+                        <p class="mt-2 text-gray-600 text-xs italic"><i class="fas fa-book"></i> ${q.ret}</p>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('vista-examen').classList.add('hidden');
+            const rank = score >= 85 ? 'text-green-600' : (score >= 60 ? 'text-blue-600' : 'text-red-600');
+            const msgRank = score >= 85 ? 'Sobresaliente' : (score >= 60 ? 'Aceptable' : 'Deficiente');
+
+            document.getElementById('reporte-contenido').innerHTML = `
+                <div class="border-4 border-gray-800 p-8 rounded-xl bg-white relative">
+                    <h2 class="text-2xl font-black mb-4 border-b pb-2">Diagnóstico Mecatrónico</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 bg-gray-50 p-4 rounded border text-sm">
+                        <div><b>Nombre:</b> ${state.alumno.nombre}</div>
+                        <div><b>Matrícula:</b> ${state.alumno.matricula}</div>
+                        <div><b>Tiempo:</b> ${formatearTiempo(state.seguridad.min, state.seguridad.seg)}</div>
+                        <div class="${state.seguridad.salidas > 0 ? 'text-red-600' : 'text-green-600'}"><b>Infracciones:</b> ${state.seguridad.salidas}</div>
+                    </div>
+                    <div class="text-center p-8 bg-gray-100 rounded-xl mb-6 shadow-inner">
+                        <p class="text-gray-500 uppercase font-bold text-sm">Calificación Final Neta</p>
+                        <p class="text-7xl font-black text-gray-800">${score}</p>
+                        <p class="text-sm text-gray-500">Puntos Base 100</p>
+                        <p class="text-xl font-bold mt-2 ${rank}">${msgRank}</p>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 border-b pb-1">Detalle de Errores Encontrados:</h3>
+                    ${reportHtml || '<div class="p-4 bg-green-50 text-green-700 rounded font-bold">¡Examen Perfecto! Cero errores detectados.</div>'}
+                </div>
+            `;
+            document.getElementById('vista-reporte').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: state.alumno.nombre, matricula: state.alumno.matricula, serie: state.alumno.serie,
+                    calificacion: score, tiempo: formatearTiempo(state.seguridad.min, state.seguridad.seg),
+                    salidasPestaña: state.seguridad.salidas
+                })
+            }).then(() => showToast("Enviado al Profesor", "success"));
+        }
+    };
+})();
 </script>
-
 </body>
 </html>
